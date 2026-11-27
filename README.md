@@ -1,0 +1,2 @@
+# JogoDeSobrevivencia
+TRABALHO MATEMATICA DISCRETA 2
