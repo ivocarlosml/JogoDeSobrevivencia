@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Última Rota — Planejador de rotas</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap');
+:root{--bg:#101713;--panel:#19251e;--panel2:#223329;--line:#3b5944;--green:#9bd66f;--green2:#527e42;--text:#e8f0e4;--muted:#b5c4b2;--yellow:#f0ca61;--blue:#00e5ff;--pink:#ff007f;--red:#ff4d4d}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#1c2b21 0,#101713 58%);color:var(--text);font-family:'Roboto Mono',monospace;padding:12px 16px}
+header{max-width:1750px;margin:0 auto 12px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+h1{font:800 clamp(28px,3.5vw,44px)/1 'Barlow Condensed',sans-serif;letter-spacing:2px;color:var(--green);margin:0}
+.subtitle{font-size:13px;color:var(--muted);margin-top:4px}
+.header-tag{border:1px solid var(--line);border-radius:6px;padding:8px 14px;color:var(--yellow);font-size:12px;font-weight:700;white-space:nowrap}
+.layout{max-width:1750px;margin:auto;display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:14px;align-items:start}
+.panel{background:linear-gradient(145deg,#1d2b22,#17221b);border:1px solid var(--line);border-radius:9px;padding:14px;box-shadow:0 10px 30px #0002}
+.map-panel{min-width:0}
+.panel-title{font:700 19px 'Barlow Condensed',sans-serif;letter-spacing:1px;color:var(--green);margin:0 0 10px;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;align-items:center}
+button,.file-button{font:700 13px 'Roboto Mono',monospace;color:var(--text);background:#304b36;border:1px solid #78a95d;border-radius:6px;padding:9px 12px;cursor:pointer;transition:.15s}
+button:hover,.file-button:hover{background:#426544}
+button.active{background:#6c963f;color:#101710;border-color:#c0ed8a}
+button.secondary,.file-button.secondary{background:#27362d;border-color:#607b64}
+button.accent{background:#1b4954;border-color:#00e5ff;color:#b2f7ff}
+button.accent:hover{background:#236170}
+button.danger{background:#4c2c29;border-color:#a85b52}
+.file-button{display:inline-flex;align-items:center}
+.file-button input{display:none}
+#mapWrap{position:relative;border:1px solid #50694e;border-radius:6px;overflow:hidden;background:#18241c;cursor:grab}
+#mapWrap:active{cursor:grabbing}
+#map{width:100%;height:auto;max-height:74vh;display:block;aspect-ratio:1000/650;touch-action:none}
+#map.empty{background-color:#233329;background-image:linear-gradient(#ffffff0b 1px,transparent 1px),linear-gradient(90deg,#ffffff0b 1px,transparent 1px);background-size:32px 32px}
+.zoom-controls{position:absolute;bottom:10px;right:10px;display:flex;gap:6px;z-index:10;background:#101713dd;padding:6px;border-radius:6px;border:1px solid var(--line)}
+.zoom-controls button{padding:6px 11px;font-size:14px}
+
+.quick-bar{position:absolute;top:10px;left:10px;z-index:10;background:#101713eb;border:1px solid var(--blue);border-radius:7px;padding:8px 10px;display:none;align-items:center;gap:6px;flex-wrap:wrap;box-shadow:0 6px 20px #0008}
+.quick-bar.visible{display:flex}
+.quick-bar-title{font-size:12px;font-weight:700;color:var(--yellow);margin-right:4px}
+.quick-bar button{padding:5px 9px;font-size:11.5px}
+
+.node-circle{fill:#00e676;stroke:#0a140d;stroke-width:2;transition:.15s}
+.node-in-route{fill:#00e5ff;stroke:#000000;stroke-width:2.2}
+.node-origin{fill:#ffea00;stroke:#000000;stroke-width:2.5}
+.node-dest{fill:#ff1744;stroke:#ffffff;stroke-width:2.5}
+.node-both{fill:#ff9100;stroke:#ffffff;stroke-width:2.5}
+.node-label{fill:#ffffff;font:700 12.5px 'Roboto Mono',monospace;text-anchor:middle;paint-order:stroke;stroke:#000000;stroke-width:3.8px;stroke-linejoin:round;pointer-events:none;user-select:none}
+
+.edge-line{stroke:#ff3b30;stroke-width:2.8;opacity:.92;cursor:pointer;transition:.15s}
+.edge-line:hover{stroke:#ffffff;stroke-width:4.5;opacity:1}
+.edge-hit{stroke:transparent;stroke-width:14;cursor:pointer;fill:none}
+.edge-route-bg{stroke:#090d0b;stroke-width:11;stroke-linecap:round;opacity:.95;pointer-events:none}
+.edge-route{stroke:#00e5ff;stroke-width:6;stroke-linecap:round;opacity:1;stroke-dasharray:12 6;animation:dashFlow .9s linear infinite;filter:drop-shadow(0 0 7px #00e5ffcc);cursor:pointer}
+@keyframes dashFlow{to{stroke-dashoffset:-18}}
+
+.edge-label{fill:#ffd54f;font:700 11.5px 'Roboto Mono',monospace;text-anchor:middle;paint-order:stroke;stroke:#000000;stroke-width:3.8px;stroke-linejoin:round;pointer-events:none;user-select:none}
+.edge-label.route-label{fill:#80f2ff;font-size:13px;stroke-width:4.5px}
+.node-hit{fill:transparent;stroke:transparent;stroke-width:14;cursor:move}
+
+.map-bottom-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-top:10px}
+.map-hint{font-size:12px;line-height:1.5;color:var(--muted);flex:1;min-width:240px}
+.actions-inline{display:flex;gap:8px;flex-wrap:wrap}
+
+.side{display:flex;flex-direction:column;gap:10px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+label{display:block;color:var(--muted);font-size:12px;font-weight:700;margin:6px 0 4px}
+input,select{width:100%;background:#101a14;color:var(--text);border:1px solid #526b55;border-radius:5px;padding:9px 10px;font:13px 'Roboto Mono',monospace;min-width:0}
+input[type=range]{padding:0;accent-color:var(--green);height:22px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.actions button{margin:0}
+.small{font-size:12px;color:var(--muted);line-height:1.6}
+.result{background:#101a14;border:1px solid #3d5942;border-left:4px solid var(--blue);padding:10px 12px;border-radius:5px;font-size:13px;line-height:1.6;overflow-wrap:anywhere;margin-top:10px}
+.result strong{color:#80f2ff}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin-top:8px}
+.statline{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:5px 0;border-bottom:1px solid #ffffff12}
+.statline span:last-child{color:var(--yellow);font-weight:700;text-align:right}
+
+.weights-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.weights-grid label{font-size:11px;margin:2px 0}
+
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.tab-btn{background:#101a14;border:1px solid #3b5944;color:var(--muted);padding:8px 6px;font-size:12px}
+.tab-btn.active{background:#304b36;color:var(--yellow);border-color:var(--yellow)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+#message{min-height:44px;font-size:12px;line-height:1.5;color:#d2dfce;background:#101a14;padding:10px;border-radius:5px;border-left:3px solid var(--green)}
+#nodeList,#edgeList{max-height:190px;overflow:auto;font-size:12px}
+.list-item{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 4px;border-bottom:1px solid #ffffff14}
+.list-item span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.list-item .btn-group{display:flex;gap:4px;flex-shrink:0}
+.list-item button{padding:5px 8px;margin:0;font-size:11px}
+.badge{font-size:12px;color:var(--yellow)}
+.footer{max-width:1750px;margin:12px auto 0;text-align:center;color:#718575;font-size:11px}
+@media(max-width:1100px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}}
+@media(max-width:720px){body{padding:10px}.side{display:flex}.weights-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>ÚLTIMA ROTA</h1><div class="subtitle">PLANEJADOR DE ROTAS • TEORIA DOS GRAFOS • FREE FIRE</div></div>
+  <div class="header-tag">GRAFO PONDERADO + DIJKSTRA</div>
+</header>
+
+<main class="layout">
+<section class="panel map-panel">
+  <h2 class="panel-title">
+    <span>Mapa de planejamento</span>
+    <span class="badge" id="zoomLevel">Zoom: 100%</span>
+  </h2>
+  <div class="toolbar" id="tools">
+    <button class="active" data-mode="select">Selecionar / Mover</button>
+    <button data-mode="add">＋ Ponto</button>
+    <button data-mode="connect">Conectar</button>
+    <button data-mode="delete">Excluir</button>
+    <button id="toggleWeights" class="secondary" title="Mostrar ou ocultar os números nas linhas">Pesos: Ocultos</button>
+    
+    <select id="presetScenario" style="width:auto;min-width:195px;border-color:var(--yellow)">
+      <option value="projetos/bermuda-padrao.json">Mapa: Bermuda</option>
+      <option value="projetos/purgatorio-padrao.json">Mapa: Purgatório</option>
+      <option value="projetos/kalahari-padrao.json">Mapa: Kalahari</option>
+    </select>
+
+    <label class="file-button secondary">Imagem Local<input id="mapUpload" type="file" accept="image/*"></label>
+  </div>
+  <div id="mapWrap">
+    <div id="quickBar" class="quick-bar">
+      <span class="quick-bar-title" id="quickNodeName">Ponto</span>
+      <button id="quickSetOrigin" class="secondary">Definir Origem</button>
+      <button id="quickSetDest" class="secondary">Definir Destino</button>
+      <button id="quickNearest" class="accent" title="Descobre qual ponto do mapa chega mais rápido/seguro aqui">Ponto mais perto até aqui</button>
+    </div>
+
+    <div class="zoom-controls">
+      <button id="zoomOut" title="Diminuir zoom">−</button>
+      <button id="zoomReset" title="Resetar zoom">100%</button>
+      <button id="zoomIn" title="Aumentar zoom">+</button>
+    </div>
+    <svg id="map" class="empty" viewBox="0 0 1000 650" role="img" aria-label="Área para montar o grafo">
+      <g id="viewport">
+        <image id="backgroundImage" x="0" y="0" width="1000" height="650" preserveAspectRatio="none" style="display:none"/>
+        <g id="edgeLayer"></g>
+        <g id="routeLayer"></g>
+        <g id="nodeLayer"></g>
+      </g>
+    </svg>
+  </div>
+  <div class="map-bottom-bar">
+    <div class="map-hint" id="modeHint">Clique em um ponto no mapa para escolher Origem, Destino ou achar o ponto mais próximo até ele.</div>
+    <div class="actions-inline">
+      <button class="secondary" id="exportBtn">Exportar (.json)</button>
+      <label class="file-button secondary">Importar (.json)<input id="importFile" type="file" accept=".json,application/json"></label>
+    </div>
+  </div>
+</section>
+
+<aside class="side">
+  <section class="panel">
+    <h2 class="panel-title">Configuração da rota</h2>
+    <div class="grid-2">
+      <div>
+        <label for="origin">Origem (Atual)</label>
+        <select id="origin"></select>
+      </div>
+      <div>
+        <label for="destination">Destino (Safe)</label>
+        <select id="destination"></select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px">
+      <button id="calculate">CALCULAR MELHOR ROTA</button>
+      <button id="clearRoute" class="secondary" title="Limpar rota do mapa">Limpar</button>
+    </div>
+    <button id="findNearestBtn" class="accent" style="width:100%;margin-top:8px" title="Calcula qual ponto do mapa tem o menor custo para chegar ao Destino escolhido">MELHOR PONTO DE ORIGEM ATÉ O DESTINO</button>
+    <div class="result" id="routeResult">Clique em um ponto no mapa ou escolha origem e destino.</div>
+    <div class="stats-grid">
+      <div class="statline"><span>Distância</span><span id="totalDistance">—</span></div>
+      <div class="statline"><span>Risco</span><span id="totalRisk">—</span></div>
+      <div class="statline"><span>Exposição</span><span id="totalExposure">—</span></div>
+      <div class="statline"><span>Custo total</span><span id="totalCost">—</span></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="panel-title">Pesos do algoritmo</h2>
+    <div class="weights-grid">
+      <div>
+        <label>Distância: <strong id="wdText">1.0</strong></label>
+        <input id="wd" type="range" min="0" max="5" step=".1" value="1">
+      </div>
+      <div>
+        <label>Risco: <strong id="wrText">2.0</strong></label>
+        <input id="wr" type="range" min="0" max="5" step=".1" value="2">
+      </div>
+      <div>
+        <label>Exposição: <strong id="weText">1.0</strong></label>
+        <input id="we" type="range" min="0" max="5" step=".1" value="1">
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="tab-actions">Ações</button>
+      <button class="tab-btn" data-tab="tab-nodes">Pontos (<span id="nodeCount">0</span>)</button>
+      <button class="tab-btn" data-tab="tab-edges">Rotas (<span id="edgeCount">0</span>)</button>
+    </div>
+
+    <div id="tab-actions" class="tab-content active">
+      <div id="message">Pronto para planejar.</div>
+      <div class="actions">
+        <button class="secondary" id="editSelected">Renomear ponto</button>
+        <button class="secondary" id="editEdge">Editar conexão</button>
+        <button class="danger" id="resetBtn">Restaurar padrão</button>
+        <button class="secondary" id="clearBackground">Sem imagem</button>
+      </div>
+    </div>
+
+    <div id="tab-nodes" class="tab-content">
+      <div id="nodeList" class="small">Nenhum ponto cadastrado.</div>
+    </div>
+
+    <div id="tab-edges" class="tab-content">
+      <div id="edgeList" class="small">Nenhuma conexão cadastrada.</div>
+    </div>
+  </section>
+</aside>
+</main>
+<div class="footer">PROJETO ACADÊMICO — TEORIA DOS GRAFOS</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const NS = "http://www.w3.org/2000/svg";
+const STORAGE_KEY = "ultimaRotaProjetoV4";
+const DEFAULT_GITHUB_SCENARIO = "projetos/bermuda-padrao.json";
+
+let nodes = [], edges = [], mode = "select", originId = "", destinationId = "";
+let selectedNode = "", selectedEdge = "", connectFirst = "", highlightedRoute = [];
+let backgroundData = "", weights = {distance:1, risk:2, exposure:1};
+let showEdgeLabels = false;
+
+let view = { scale: 1, x: 0, y: 0 };
+let isPanning = false, panStart = { x: 0, y: 0 }, movedDuringPan = false;
+let draggingNodeId = null, movedDuringDrag = false;
+
+$("toggleWeights").onclick = () => {
+  showEdgeLabels = !showEdgeLabels;
+  $("toggleWeights").textContent = showEdgeLabels ? "Pesos: Visíveis" : "Pesos: Ocultos";
+  $("toggleWeights").classList.toggle("active", showEdgeLabels);
+  draw();
+};
+
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+    btn.classList.add("active");
+    $(btn.dataset.tab).classList.add("active");
+  });
+});
+
+function updateQuickBar(){
+  const n = getNode(selectedNode);
+  if (n && mode === "select") {
+    $("quickNodeName").textContent = "📍 " + n.name;
+    $("quickBar").classList.add("visible");
+  } else {
+    $("quickBar").classList.remove("visible");
+  }
+}
+
+$("quickSetOrigin").onclick = () => {
+  if (!selectedNode) return;
+  originId = selectedNode;
+  refresh();
+  if (originId && destinationId && originId !== destinationId) $("calculate").click();
+  else message(`Origem definida como "${getNode(originId).name}". Agora selecione o Destino.`);
+};
+
+$("quickSetDest").onclick = () => {
+  if (!selectedNode) return;
+  destinationId = selectedNode;
+  refresh();
+  if (originId && destinationId && originId !== destinationId) $("calculate").click();
+  else message(`Destino definido como "${getNode(destinationId).name}". Clique em "Ponto mais perto até aqui" ou escolha a Origem.`);
+};
+
+$("quickNearest").onclick = () => {
+  if (!selectedNode) return;
+  destinationId = selectedNode;
+  findBestOriginForDestination(destinationId);
+};
+
+$("findNearestBtn").onclick = () => {
+  const target = destinationId || selectedNode;
+  if (!target) {
+    message("Selecione um ponto no mapa ou escolha um Destino primeiro.");
+    return;
+  }
+  destinationId = target;
+  findBestOriginForDestination(target);
+};
+
+function findBestOriginForDestination(targetId){
+  const targetNode = getNode(targetId);
+  if (!targetNode) return;
+
+  let bestResult = null;
+  let bestOriginId = "";
+
+  nodes.forEach(candidate => {
+    if (candidate.id === targetId) return;
+    const res = dijkstra(candidate.id, targetId);
+    if (res && (!bestResult || res.cost < bestResult.cost)) {
+      bestResult = res;
+      bestOriginId = candidate.id;
+    }
+  });
+
+  if (!bestResult) {
+    highlightedRoute = [];
+    $("routeResult").textContent = `Nenhum outro ponto possui caminho conectado até "${targetNode.name}".`;
+    ["totalDistance", "totalRisk", "totalExposure", "totalCost"].forEach(id => $(id).textContent = "—");
+    refresh();
+    return;
+  }
+
+  originId = bestOriginId;
+  destinationId = targetId;
+  highlightedRoute = bestResult.path;
+  refresh();
+
+  const startNode = getNode(bestOriginId);
+  $("routeResult").innerHTML =
+    `<strong>MELHOR ACESSO ATÉ ${targetNode.name.toUpperCase()}</strong><br>` +
+    `Mais próximo: <strong>${startNode.name}</strong><br>` +
+    bestResult.path.map(id => getNode(id).name).join(" → ");
+  $("totalDistance").textContent = fmt(bestResult.distance);
+  $("totalRisk").textContent = fmt(bestResult.risk);
+  $("totalExposure").textContent = fmt(bestResult.exposure);
+  $("totalCost").textContent = fmt(bestResult.cost);
+  message(`Ponto mais perto para chegar em "${targetNode.name}": "${startNode.name}" (Custo: ${fmt(bestResult.cost)}).`);
+}
+
+function updateTransform(){
+  $("viewport").setAttribute("transform", `translate(${view.x}, ${view.y}) scale(${view.scale})`);
+  $("zoomLevel").textContent = `Zoom: ${Math.round(view.scale * 100)}%`;
+}
+
+function zoomAt(factor, centerX = 500, centerY = 325){
+  const nextScale = Math.max(0.6, Math.min(6, view.scale * factor));
+  const ratio = nextScale / view.scale;
+  view.x = centerX - (centerX - view.x) * ratio;
+  view.y = centerY - (centerY - view.y) * ratio;
+  view.scale = nextScale;
+  updateTransform();
+}
+
+$("zoomIn").onclick = () => zoomAt(1.3);
+$("zoomOut").onclick = () => zoomAt(1 / 1.3);
+$("zoomReset").onclick = () => { view = { scale: 1, x: 0, y: 0 }; updateTransform(); };
+
+$("map").addEventListener("wheel", evt => {
+  evt.preventDefault();
+  const pt = rawSvgPoint(evt);
+  zoomAt(evt.deltaY < 0 ? 1.18 : 1 / 1.18, pt.x, pt.y);
+}, { passive: false });
+
+$("map").addEventListener("pointerdown", evt => {
+  if (evt.button === 1 || evt.button === 2 || (evt.button === 0 && mode === "select" && !evt.target.closest(".node-hit"))) {
+    isPanning = true;
+    movedDuringPan = false;
+    const pt = rawSvgPoint(evt);
+    panStart = { x: pt.x - view.x, y: pt.y - view.y };
+  }
+});
+
+window.addEventListener("pointermove", evt => {
+  if (draggingNodeId) {
+    movedDuringDrag = true;
+    const p = mapPoint(evt);
+    const n = getNode(draggingNodeId);
+    if (n) {
+      n.x = Math.round(Math.max(5, Math.min(995, p.x)));
+      n.y = Math.round(Math.max(5, Math.min(645, p.y)));
+      draw();
+    }
+    return;
+  }
+  if (!isPanning) return;
+  movedDuringPan = true;
+  const pt = rawSvgPoint(evt);
+  view.x = pt.x - panStart.x;
+  view.y = pt.y - panStart.y;
+  updateTransform();
+});
+
+window.addEventListener("pointerup", () => {
+  if (draggingNodeId) {
+    const n = getNode(draggingNodeId);
+    draggingNodeId = null;
+    if (movedDuringDrag && n) {
+      saveLocal();
+      message(`Ponto "${n.name}" movido para X:${n.x}, Y:${n.y}.`);
+    }
+  }
+  isPanning = false;
+});
+
+function rawSvgPoint(evt){
+  const p = $("map").createSVGPoint();
+  p.x = evt.clientX; p.y = evt.clientY;
+  return p.matrixTransform($("map").getScreenCTM().inverse());
+}
+
+function mapPoint(evt){
+  const p = rawSvgPoint(evt);
+  return { x: (p.x - view.x) / view.scale, y: (p.y - view.y) / view.scale };
+}
+
+function uid(){ return "p" + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function message(text){ $("message").textContent = text; }
+function getNode(id){ return nodes.find(n => n.id === id); }
+function getEdge(a,b){ return edges.find(e => (e.from===a&&e.to===b)||(e.from===b&&e.to===a)); }
+function edgeCost(e){ return e.distance*weights.distance + e.risk*weights.risk + e.exposure*weights.exposure; }
+function fmt(n){ return Number(n.toFixed(2)).toString(); }
+
+function setMode(next){
+  mode = next; connectFirst = "";
+  document.querySelectorAll("[data-mode]").forEach(b => b.classList.toggle("active", b.dataset.mode === mode));
+  const hints = {
+    select: "Clique em um ponto no mapa para escolher Origem, Destino ou achar o ponto mais próximo até ele.",
+    add: "Dê zoom para precisão e clique no mapa para criar um ponto.",
+    connect: "Clique no primeiro ponto e depois no segundo para conectar.",
+    delete: "Clique em um ponto ou em uma linha de rota para excluir."
+  };
+  $("modeHint").textContent = hints[mode];
+  updateQuickBar();
+}
+document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => setMode(b.dataset.mode)));
+
+$("map").addEventListener("click", evt => {
+  if (movedDuringPan || evt.target.closest(".node-hit") || evt.target.closest(".edge-hit")) return;
+  if (mode === "select") {
+    selectedNode = "";
+    selectedEdge = "";
+    draw();
+    return;
+  }
+  if (mode !== "add") return;
+  const p = mapPoint(evt);
+  const name = prompt("Nome do local (ex.: Clock Tower):", "P" + (nodes.length + 1));
+  if (name === null) return;
+  const clean = name.trim();
+  if (!clean) { message("O nome do ponto não pode ficar vazio."); return; }
+  const n = { id: uid(), name: clean, x: Math.round(Math.max(5, Math.min(995, p.x))), y: Math.round(Math.max(5, Math.min(645, p.y))) };
+  nodes.push(n); selectedNode = n.id;
+  if (!originId) originId = n.id; else if (!destinationId) destinationId = n.id;
+  refresh(); message("Ponto " + clean + " adicionado.");
+});
+
+function deleteEdgeById(edgeId){
+  const e = edges.find(x => x.id === edgeId);
+  if (!e) return;
+  const nA = getNode(e.from)?.name || "?";
+  const nB = getNode(e.to)?.name || "?";
+  if (!confirm(`Excluir a rota entre "${nA}" e "${nB}"?`)) return;
+  edges = edges.filter(x => x.id !== edgeId);
+  if (selectedEdge === edgeId) selectedEdge = "";
+  highlightedRoute = [];
+  refresh();
+  message(`Rota entre "${nA}" e "${nB}" excluída.`);
+}
+
+function handleEdgeClick(edgeId){
+  if (mode === "delete") {
+    deleteEdgeById(edgeId);
+    return;
+  }
+  selectedEdge = edgeId;
+  selectedNode = "";
+  const e = edges.find(x => x.id === edgeId);
+  if (e) {
+    message(`Conexão selecionada: ${getNode(e.from)?.name} ↔ ${getNode(e.to)?.name} (Dist: ${e.distance} | Risco: ${e.risk} | Exp: ${e.exposure}).`);
+  }
+  refresh();
+}
+
+function handleNode(id){
+  const n = getNode(id); if (!n) return;
+  selectedNode = id; selectedEdge = "";
+  if (mode === "delete"){
+    if (!confirm("Excluir \"" + n.name + "\" e todas as rotas ligadas a ele?")) return;
+    nodes = nodes.filter(x => x.id !== id);
+    edges = edges.filter(e => e.from !== id && e.to !== id);
+    if (originId === id) originId = "";
+    if (destinationId === id) destinationId = "";
+    highlightedRoute = []; selectedNode = ""; refresh(); message("Ponto excluído."); return;
+  }
+  if (mode === "connect"){
+    if (!connectFirst){ connectFirst = id; message("Origem da conexão: " + n.name + ". Clique no próximo ponto."); }
+    else if (connectFirst === id){ connectFirst = ""; message("Conexão cancelada."); }
+    else {
+      const a = connectFirst, b = id; connectFirst = "";
+      if (getEdge(a, b)){ message("Pontos já conectados."); return; }
+      const distance = askNumber("Distância entre " + getNode(a).name + " e " + n.name + ":", 5);
+      if (distance === null) return;
+      const risk = askNumber("Risco (0 a 10):", 2);
+      if (risk === null) return;
+      const exposure = askNumber("Exposição (0 a 10):", 2);
+      if (exposure === null) return;
+      edges.push({ id: uid(), from: a, to: b, distance, risk, exposure });
+      highlightedRoute = []; refresh(); message("Conexão criada.");
+    }
+    draw(); return;
+  }
+  message(`Ponto "${n.name}" selecionado. Use a barra no topo do mapa para definir Origem, Destino ou achar o ponto mais perto até ele.`);
+  refresh();
+}
+
+function askNumber(label, def){
+  const v = prompt(label, String(def)); if (v === null) return null;
+  const n = Number(v.replace(",", "."));
+  if (!Number.isFinite(n) || n < 0){ alert("Informe um número válido >= 0."); return askNumber(label, def); }
+  return n;
+}
+
+function draw(){
+  updateQuickBar();
+  const eg = $("edgeLayer"), rg = $("routeLayer"), ng = $("nodeLayer");
+  eg.innerHTML = ""; rg.innerHTML = ""; ng.innerHTML = "";
+  if (backgroundData){
+    $("backgroundImage").setAttribute("href", backgroundData);
+    $("backgroundImage").style.display = "";
+    $("map").classList.remove("empty");
+  } else {
+    $("backgroundImage").style.display = "none";
+    $("map").classList.add("empty");
+  }
+
+  const hasRoute = highlightedRoute.length > 1;
+
+  edges.forEach(e => {
+    const a = getNode(e.from), b = getNode(e.to); if (!a || !b) return;
+    const isRoute = routeHas(e);
+
+    if (!isRoute) {
+      const line = document.createElementNS(NS, "line");
+      line.setAttribute("x1", a.x); line.setAttribute("y1", a.y);
+      line.setAttribute("x2", b.x); line.setAttribute("y2", b.y);
+      line.setAttribute("class", "edge-line");
+      eg.appendChild(line);
+
+      const hitLine = document.createElementNS(NS, "line");
+      hitLine.setAttribute("x1", a.x); hitLine.setAttribute("y1", a.y);
+      hitLine.setAttribute("x2", b.x); hitLine.setAttribute("y2", b.y);
+      hitLine.setAttribute("class", "edge-hit");
+      hitLine.addEventListener("click", ev => { ev.stopPropagation(); handleEdgeClick(e.id); });
+      eg.appendChild(hitLine);
+    }
+
+    if (showEdgeLabels) {
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("x", (a.x + b.x) / 2);
+      t.setAttribute("y", (a.y + b.y) / 2 - 8);
+      t.setAttribute("class", "edge-label" + (isRoute ? " route-label" : ""));
+      t.textContent = fmt(e.distance) + "|" + fmt(e.risk) + "|" + fmt(e.exposure);
+      (isRoute ? rg : eg).appendChild(t);
+    }
+  });
+
+  if (hasRoute) {
+    for (let i = 0; i < highlightedRoute.length - 1; i++) {
+      const a = getNode(highlightedRoute[i]), b = getNode(highlightedRoute[i + 1]);
+      if (!a || !b) continue;
+      const e = getEdge(a.id, b.id);
+
+      const bgLine = document.createElementNS(NS, "line");
+      bgLine.setAttribute("x1", a.x); bgLine.setAttribute("y1", a.y);
+      bgLine.setAttribute("x2", b.x); bgLine.setAttribute("y2", b.y);
+      bgLine.setAttribute("class", "edge-route-bg");
+      rg.appendChild(bgLine);
+
+      const fgLine = document.createElementNS(NS, "line");
+      fgLine.setAttribute("x1", a.x); fgLine.setAttribute("y1", a.y);
+      fgLine.setAttribute("x2", b.x); fgLine.setAttribute("y2", b.y);
+      fgLine.setAttribute("class", "edge-route");
+      if (e) fgLine.addEventListener("click", ev => { ev.stopPropagation(); handleEdgeClick(e.id); });
+      rg.appendChild(fgLine);
+    }
+  }
+
+  nodes.forEach(n => {
+    const g = document.createElementNS(NS, "g");
+    const inRoute = highlightedRoute.includes(n.id);
+    const c = document.createElementNS(NS, "circle");
+    c.setAttribute("cx", n.x); c.setAttribute("cy", n.y);
+    c.setAttribute("r", (n.id === originId || n.id === destinationId) ? 7 : (inRoute ? 6 : 5));
+    let cls = "node-circle";
+    if (n.id === originId && n.id === destinationId) cls += " node-both";
+    else if (n.id === originId) cls += " node-origin";
+    else if (n.id === destinationId) cls += " node-dest";
+    else if (inRoute) cls += " node-in-route";
+    c.setAttribute("class", cls);
+    g.appendChild(c);
+
+    const hit = document.createElementNS(NS, "circle");
+    hit.setAttribute("cx", n.x); hit.setAttribute("cy", n.y); hit.setAttribute("r", 13);
+    hit.setAttribute("class", "node-hit");
+    hit.style.cursor = mode === "select" ? "move" : "pointer";
+    hit.addEventListener("pointerdown", ev => {
+      if (ev.button === 0 && mode === "select") {
+        ev.stopPropagation();
+        draggingNodeId = n.id;
+        movedDuringDrag = false;
+        selectedNode = n.id;
+        selectedEdge = "";
+        updateQuickBar();
+      }
+    });
+    hit.addEventListener("click", ev => {
+      ev.stopPropagation();
+      if (movedDuringDrag) { movedDuringDrag = false; return; }
+      handleNode(n.id);
+    });
+    g.appendChild(hit);
+
+    const label = document.createElementNS(NS, "text");
+    label.setAttribute("x", n.x);
+    label.setAttribute("y", n.y - 10);
+    label.setAttribute("class", "node-label");
+    label.textContent = n.name.length > 16 ? n.name.slice(0, 15) + "…" : n.name;
+    g.appendChild(label);
+
+    if (selectedNode === n.id){
+      const ring = document.createElementNS(NS, "circle");
+      ring.setAttribute("cx", n.x); ring.setAttribute("cy", n.y); ring.setAttribute("r", 10);
+      ring.setAttribute("fill", "none"); ring.setAttribute("stroke", "#00e5ff");
+      ring.setAttribute("stroke-dasharray", "3 3"); ring.setAttribute("stroke-width", "2");
+      g.appendChild(ring);
+    }
+    ng.appendChild(g);
+  });
+}
+
+function routeHas(edge){
+  for (let i = 0; i < highlightedRoute.length - 1; i++){
+    if ((highlightedRoute[i] === edge.from && highlightedRoute[i+1] === edge.to) ||
+        (highlightedRoute[i] === edge.to && highlightedRoute[i+1] === edge.from)) return true;
+  }
+  return false;
+}
+
+function refresh(){
+  $("origin").innerHTML = ""; $("destination").innerHTML = "";
+  const addOpt = (sel, label) => { const o = document.createElement("option"); o.value = ""; o.textContent = label; sel.appendChild(o); };
+  addOpt($("origin"), "Origem..."); addOpt($("destination"), "Destino...");
+  nodes.forEach(n => {
+    for (const id of ["origin", "destination"]){
+      const o = document.createElement("option"); o.value = n.id; o.textContent = n.name; $(id).appendChild(o);
+    }
+  });
+  $("origin").value = originId; $("destination").value = destinationId;
+  $("nodeCount").textContent = nodes.length; $("edgeCount").textContent = edges.length;
+
+  $("nodeList").innerHTML = nodes.length ? "" : "Nenhum ponto.";
+  nodes.forEach(n => {
+    const row = document.createElement("div"); row.className = "list-item";
+    const name = document.createElement("span");
+    name.textContent = n.name + (n.id === originId ? " [ORIGEM]" : "") + (n.id === destinationId ? " [DESTINO]" : "");
+    const btnGroup = document.createElement("div"); btnGroup.className = "btn-group";
+    const btn = document.createElement("button"); btn.textContent = "Focar";
+    btn.onclick = () => { selectedNode = n.id; selectedEdge = ""; draw(); };
+    btnGroup.append(btn);
+    row.append(name, btnGroup); $("nodeList").appendChild(row);
+  });
+
+  $("edgeList").innerHTML = edges.length ? "" : "Nenhuma conexão.";
+  edges.forEach(e => {
+    const row = document.createElement("div"); row.className = "list-item";
+    const label = document.createElement("span");
+    const txt = getNode(e.from).name + " ↔ " + getNode(e.to).name + " (" + fmt(edgeCost(e)) + ")";
+    label.textContent = txt;
+    label.title = txt;
+    const btnGroup = document.createElement("div"); btnGroup.className = "btn-group";
+    const btnEdit = document.createElement("button"); btnEdit.textContent = "Editar";
+    btnEdit.onclick = () => { selectedEdge = e.id; selectedNode = ""; editSelectedEdge(); };
+    const btnDel = document.createElement("button"); btnDel.className = "danger"; btnDel.textContent = "✕";
+    btnDel.title = "Excluir esta rota";
+    btnDel.onclick = () => deleteEdgeById(e.id);
+    btnGroup.append(btnEdit, btnDel);
+    row.append(label, btnGroup); $("edgeList").appendChild(row);
+  });
+
+  ["wd", "wr", "we"].forEach(id => $(id + "Text").textContent = Number($(id).value).toFixed(1));
+  draw(); saveLocal();
+}
+
+$("origin").addEventListener("change", e => { originId = e.target.value; highlightedRoute = []; refresh(); });
+$("destination").addEventListener("change", e => { destinationId = e.target.value; highlightedRoute = []; refresh(); });
+["wd", "wr", "we"].forEach(id => $(id).addEventListener("input", () => {
+  weights = { distance: Number($("wd").value), risk: Number($("wr").value), exposure: Number($("we").value) };
+  $("wdText").textContent = weights.distance.toFixed(1);
+  $("wrText").textContent = weights.risk.toFixed(1);
+  $("weText").textContent = weights.exposure.toFixed(1);
+  highlightedRoute = []; draw(); saveLocal();
+}));
+
+function dijkstra(start, end){
+  const dist = {}, prev = {}, done = new Set();
+  nodes.forEach(n => { dist[n.id] = Infinity; prev[n.id] = null; }); dist[start] = 0;
+  while (true){
+    let current = null, best = Infinity;
+    for (const id in dist) if (!done.has(id) && dist[id] < best){ best = dist[id]; current = id; }
+    if (current === null || current === end) break;
+    done.add(current);
+    edges.filter(e => e.from === current || e.to === current).forEach(e => {
+      const next = e.from === current ? e.to : e.from, candidate = dist[current] + edgeCost(e);
+      if (candidate < dist[next]){ dist[next] = candidate; prev[next] = current; }
+    });
+  }
+  if (dist[end] === Infinity) return null;
+  const path = []; for (let at = end; at !== null; at = prev[at]) path.unshift(at);
+  let totals = { distance: 0, risk: 0, exposure: 0 };
+  for (let i = 0; i < path.length - 1; i++){
+    const e = getEdge(path[i], path[i+1]);
+    totals.distance += e.distance; totals.risk += e.risk; totals.exposure += e.exposure;
+  }
+  return { path, cost: dist[end], ...totals };
+}
+
+$("calculate").onclick = () => {
+  if (!originId || !destinationId){ message("Selecione origem e destino."); return; }
+  if (originId === destinationId){ message("Origem e destino devem ser diferentes."); return; }
+  const result = dijkstra(originId, destinationId);
+  if (!result){
+    highlightedRoute = [];
+    $("routeResult").textContent = "Sem caminho entre os pontos selecionados.";
+    ["totalDistance", "totalRisk", "totalExposure", "totalCost"].forEach(id => $(id).textContent = "—");
+    draw(); return;
+  }
+  highlightedRoute = result.path;
+  $("routeResult").innerHTML = "<strong>ROTA RECOMENDADA</strong><br>" + result.path.map(id => getNode(id).name).join(" → ");
+  $("totalDistance").textContent = fmt(result.distance);
+  $("totalRisk").textContent = fmt(result.risk);
+  $("totalExposure").textContent = fmt(result.exposure);
+  $("totalCost").textContent = fmt(result.cost);
+  draw(); message("Rota mais segura calculada (destacada em ciano neon animado).");
+};
+
+$("clearRoute").onclick = () => {
+  highlightedRoute = [];
+  $("routeResult").textContent = "Clique em um ponto no mapa ou escolha origem e destino.";
+  ["totalDistance", "totalRisk", "totalExposure", "totalCost"].forEach(id => $(id).textContent = "—");
+  draw();
+  message("Rota limpa do mapa.");
+};
+
+$("editSelected").onclick = () => {
+  if (!selectedNode){ message("Selecione um ponto primeiro."); return; }
+  const n = getNode(selectedNode), name = prompt("Novo nome:", n.name);
+  if (name && name.trim()){ n.name = name.trim(); refresh(); }
+};
+
+function editSelectedEdge(){
+  const e = edges.find(x => x.id === selectedEdge); if (!e){ message("Selecione uma conexão no mapa ou na aba Rotas."); return; }
+  const d = askNumber("Distância:", e.distance); if (d === null) return;
+  const r = askNumber("Risco:", e.risk); if (r === null) return;
+  const x = askNumber("Exposição:", e.exposure); if (x === null) return;
+  e.distance = d; e.risk = r; e.exposure = x; highlightedRoute = []; refresh();
+}
+$("editEdge").onclick = editSelectedEdge;
+
+$("mapUpload").addEventListener("change", e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => { backgroundData = reader.result; refresh(); message("Imagem local carregada."); };
+  reader.readAsDataURL(file); e.target.value = "";
+});
+$("clearBackground").onclick = () => { backgroundData = ""; refresh(); };
+
+function projectData(){
+  const currentScenario = $("presetScenario").value;
+  let defaultBg = "mapas/bermuda.jpeg";
+  if (currentScenario.includes("purgatorio")) defaultBg = "mapas/purgatorio.jpg";
+  else if (currentScenario.includes("kalahari")) defaultBg = "mapas/kalahari.jpg";
+  const cleanBg = backgroundData.startsWith("data:") ? defaultBg : backgroundData;
+  return { version: 4, nodes, edges, originId, destinationId, weights, backgroundData: cleanBg };
+}
+function saveLocal(){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 4, nodes, edges, originId, destinationId, weights, backgroundData })); } catch (e) {} }
+
+function loadData(data){
+  if (!data || !Array.isArray(data.nodes) || !Array.isArray(data.edges)) throw new Error("JSON inválido.");
+  nodes = data.nodes; edges = data.edges; originId = data.originId || ""; destinationId = data.destinationId || "";
+  weights = data.weights || { distance: 1, risk: 2, exposure: 1 }; backgroundData = data.backgroundData || "";
+  $("wd").value = weights.distance; $("wr").value = weights.risk; $("we").value = weights.exposure;
+  highlightedRoute = []; selectedNode = ""; selectedEdge = "";
+  view = { scale: 1, x: 0, y: 0 }; updateTransform();
+  refresh();
+  if (originId && destinationId) $("calculate").click();
+}
+
+async function loadGithubScenario(path){
+  if (!path) return;
+  try {
+    const res = await fetch(path);
+    if (!res.ok) throw new Error("Arquivo não encontrado.");
+    const data = await res.json();
+    loadData(data);
+    message("Mapa carregado: " + path);
+  } catch (err) {
+    message("Erro ao carregar " + path + ". Verifique se o arquivo está no GitHub.");
+    refresh();
+  }
+}
+
+$("presetScenario").addEventListener("change", e => loadGithubScenario(e.target.value));
+
+$("exportBtn").onclick = () => {
+  const currentName = $("presetScenario").value.split("/").pop() || "mapa-padrao.json";
+  const blob = new Blob([JSON.stringify(projectData(), null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob), a = document.createElement("a");
+  a.href = url; a.download = currentName; a.click(); URL.revokeObjectURL(url);
+  message("Arquivo " + currentName + " exportado! Substitua-o na pasta 'projetos/' do GitHub.");
+};
+
+$("importFile").addEventListener("change", e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => { try { loadData(JSON.parse(reader.result)); message("Projeto importado."); } catch (err) { alert(err.message); } };
+  reader.readAsText(file); e.target.value = "";
+});
+
+$("resetBtn").onclick = () => {
+  if (!confirm("Restaurar os pontos originais do GitHub?")) return;
+  localStorage.removeItem(STORAGE_KEY);
+  loadGithubScenario($("presetScenario").value || DEFAULT_GITHUB_SCENARIO);
+};
+
+(async function init(){
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved && JSON.parse(saved).nodes.length > 0){
+      loadData(JSON.parse(saved));
+      return;
+    }
+  } catch (e) {}
+  await loadGithubScenario(DEFAULT_GITHUB_SCENARIO);
+})();
+setMode("select");
+</script>
+</body>
+</html>

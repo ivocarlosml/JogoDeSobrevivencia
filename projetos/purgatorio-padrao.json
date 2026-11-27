@@ -1,0 +1,52 @@
+{
+  "version": 4,
+  "backgroundData": "mapas/purgatorio.jpeg",
+  "weights": {
+    "distance": 1,
+    "risk": 2,
+    "exposure": 1
+  },
+  "originId": "p_crossroads",
+  "destinationId": "p_lumber",
+  "nodes": [
+    { "id": "p_crossroads", "name": "Crossroads", "x": 195, "y": 165 },
+    { "id": "p_moathouse", "name": "Moathouse", "x": 325, "y": 135 },
+    { "id": "p_fields", "name": "Fields", "x": 495, "y": 210 },
+    { "id": "p_mtvilla", "name": "Mt. Villa", "x": 745, "y": 165 },
+    { "id": "p_ski", "name": "Ski Lodge", "x": 835, "y": 275 },
+    { "id": "p_campsite", "name": "Campsite", "x": 205, "y": 310 },
+    { "id": "p_central", "name": "Central", "x": 345, "y": 375 },
+    { "id": "p_brasilia", "name": "Brasília", "x": 515, "y": 345 },
+    { "id": "p_marble", "name": "Marbleworks", "x": 685, "y": 365 },
+    { "id": "p_golf", "name": "Golf Course", "x": 215, "y": 475 },
+    { "id": "p_forge", "name": "Forge", "x": 435, "y": 505 },
+    { "id": "p_trailer", "name": "Trailer Park", "x": 315, "y": 565 },
+    { "id": "p_quarry", "name": "Quarry", "x": 575, "y": 545 },
+    { "id": "p_lumber", "name": "Lumber Mill", "x": 765, "y": 515 },
+    { "id": "p_fire", "name": "Fire Brigade", "x": 845, "y": 405 }
+  ],
+  "edges": [
+    { "id": "ep1", "from": "p_crossroads", "to": "p_moathouse", "distance": 4, "risk": 2, "exposure": 3 },
+    { "id": "ep2", "from": "p_crossroads", "to": "p_campsite", "distance": 4, "risk": 2, "exposure": 2 },
+    { "id": "ep3", "from": "p_moathouse", "to": "p_fields", "distance": 5, "risk": 3, "exposure": 5 },
+    { "id": "ep4", "from": "p_fields", "to": "p_mtvilla", "distance": 6, "risk": 3, "exposure": 5 },
+    { "id": "ep5", "from": "p_fields", "to": "p_brasilia", "distance": 4, "risk": 5, "exposure": 4 },
+    { "id": "ep6", "from": "p_mtvilla", "to": "p_ski", "distance": 3, "risk": 2, "exposure": 2 },
+    { "id": "ep7", "from": "p_ski", "to": "p_marble", "distance": 4, "risk": 3, "exposure": 3 },
+    { "id": "ep8", "from": "p_ski", "to": "p_fire", "distance": 4, "risk": 2, "exposure": 2 },
+    { "id": "ep9", "from": "p_campsite", "to": "p_central", "distance": 4, "risk": 3, "exposure": 3 },
+    { "id": "ep10", "from": "p_campsite", "to": "p_golf", "distance": 4, "risk": 2, "exposure": 4 },
+    { "id": "ep11", "from": "p_central", "to": "p_brasilia", "distance": 5, "risk": 5, "exposure": 5 },
+    { "id": "ep12", "from": "p_central", "to": "p_golf", "distance": 4, "risk": 2, "exposure": 3 },
+    { "id": "ep13", "from": "p_central", "to": "p_forge", "distance": 4, "risk": 3, "exposure": 2 },
+    { "id": "ep14", "from": "p_brasilia", "to": "p_marble", "distance": 5, "risk": 4, "exposure": 4 },
+    { "id": "ep15", "from": "p_brasilia", "to": "p_forge", "distance": 5, "risk": 4, "exposure": 3 },
+    { "id": "ep16", "from": "p_marble", "to": "p_fire", "distance": 4, "risk": 2, "exposure": 2 },
+    { "id": "ep17", "from": "p_marble", "to": "p_lumber", "distance": 5, "risk": 3, "exposure": 3 },
+    { "id": "ep18", "from": "p_golf", "to": "p_trailer", "distance": 3, "risk": 2, "exposure": 2 },
+    { "id": "ep19", "from": "p_trailer", "to": "p_forge", "distance": 4, "risk": 2, "exposure": 2 },
+    { "id": "ep20", "from": "p_forge", "to": "p_quarry", "distance": 4, "risk": 3, "exposure": 3 },
+    { "id": "ep21", "from": "p_quarry", "to": "p_lumber", "distance": 5, "risk": 3, "exposure": 3 },
+    { "id": "ep22", "from": "p_fire", "to": "p_lumber", "distance": 4, "risk": 2, "exposure": 2 }
+  ]
+}

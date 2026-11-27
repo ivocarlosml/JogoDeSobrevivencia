@@ -1,0 +1,547 @@
+{
+  "version": 4,
+  "nodes": [
+    {
+      "id": "b_graveyard",
+      "name": "Graveyard",
+      "x": 211,
+      "y": 124
+    },
+    {
+      "id": "b_bulls",
+      "name": "Bullseye",
+      "x": 283,
+      "y": 60
+    },
+    {
+      "id": "b_shipyard",
+      "name": "Shipyard",
+      "x": 410,
+      "y": 30
+    },
+    {
+      "id": "b_mill",
+      "name": "Mill",
+      "x": 718,
+      "y": 142
+    },
+    {
+      "id": "b_observatory",
+      "name": "Observatory",
+      "x": 135,
+      "y": 208
+    },
+    {
+      "id": "b_plantation",
+      "name": "Plantation",
+      "x": 425,
+      "y": 125
+    },
+    {
+      "id": "b_riverside",
+      "name": "Riverside",
+      "x": 603,
+      "y": 100
+    },
+    {
+      "id": "b_hangar",
+      "name": "Hangar",
+      "x": 206,
+      "y": 367
+    },
+    {
+      "id": "b_clock",
+      "name": "Clock Tower",
+      "x": 350,
+      "y": 427
+    },
+    {
+      "id": "b_peak",
+      "name": "Peak",
+      "x": 583,
+      "y": 373
+    },
+    {
+      "id": "b_keraton",
+      "name": "Keraton",
+      "x": 829,
+      "y": 235
+    },
+    {
+      "id": "b_bimasakti",
+      "name": "Bimasakti Strip",
+      "x": 449,
+      "y": 274
+    },
+    {
+      "id": "b_katulistiwa",
+      "name": "Katulistiwa",
+      "x": 299,
+      "y": 221
+    },
+    {
+      "id": "b_pochinok",
+      "name": "Pochinok",
+      "x": 588,
+      "y": 512
+    },
+    {
+      "id": "b_factory",
+      "name": "Factory",
+      "x": 447,
+      "y": 505
+    },
+    {
+      "id": "b_cape",
+      "name": "Cape Town",
+      "x": 929,
+      "y": 355
+    },
+    {
+      "id": "b_rimnam",
+      "name": "Rim Nam Village",
+      "x": 141,
+      "y": 518
+    },
+    {
+      "id": "b_mars",
+      "name": "Mars Electric",
+      "x": 516,
+      "y": 628
+    },
+    {
+      "id": "pmwzgrkrl7nes",
+      "name": "Peak1",
+      "x": 633,
+      "y": 286
+    },
+    {
+      "id": "pmwzgw0jukg30",
+      "name": "KotaTua",
+      "x": 728,
+      "y": 423
+    },
+    {
+      "id": "pmwzh11pskh0d",
+      "name": "SentosaE",
+      "x": 913,
+      "y": 540
+    },
+    {
+      "id": "pmwzh5rdshidb",
+      "name": "SentosaD",
+      "x": 793,
+      "y": 618
+    }
+  ],
+  "edges": [
+    {
+      "id": "eb1",
+      "from": "b_graveyard",
+      "to": "b_bulls",
+      "distance": 3,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "eb2",
+      "from": "b_graveyard",
+      "to": "b_observatory",
+      "distance": 4,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "eb3",
+      "from": "b_bulls",
+      "to": "b_shipyard",
+      "distance": 4,
+      "risk": 3,
+      "exposure": 3
+    },
+    {
+      "id": "eb4",
+      "from": "b_bulls",
+      "to": "b_plantation",
+      "distance": 4,
+      "risk": 2,
+      "exposure": 3
+    },
+    {
+      "id": "eb5",
+      "from": "b_shipyard",
+      "to": "b_riverside",
+      "distance": 4,
+      "risk": 3,
+      "exposure": 4
+    },
+    {
+      "id": "eb7",
+      "from": "b_mill",
+      "to": "b_riverside",
+      "distance": 4,
+      "risk": 3,
+      "exposure": 3
+    },
+    {
+      "id": "eb8",
+      "from": "b_mill",
+      "to": "b_keraton",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "eb9",
+      "from": "b_observatory",
+      "to": "b_hangar",
+      "distance": 4,
+      "risk": 3,
+      "exposure": 3
+    },
+    {
+      "id": "eb10",
+      "from": "b_hangar",
+      "to": "b_clock",
+      "distance": 3,
+      "risk": 5,
+      "exposure": 4
+    },
+    {
+      "id": "eb11",
+      "from": "b_hangar",
+      "to": "b_katulistiwa",
+      "distance": 4,
+      "risk": 3,
+      "exposure": 3
+    },
+    {
+      "id": "eb14",
+      "from": "b_riverside",
+      "to": "b_plantation",
+      "distance": 4,
+      "risk": 12,
+      "exposure": 3
+    },
+    {
+      "id": "eb16",
+      "from": "b_clock",
+      "to": "b_peak",
+      "distance": 8,
+      "risk": 10,
+      "exposure": 10
+    },
+    {
+      "id": "eb17",
+      "from": "b_clock",
+      "to": "b_bimasakti",
+      "distance": 7,
+      "risk": 10,
+      "exposure": 10
+    },
+    {
+      "id": "eb18",
+      "from": "b_peak",
+      "to": "b_bimasakti",
+      "distance": 3,
+      "risk": 10,
+      "exposure": 10
+    },
+    {
+      "id": "eb19",
+      "from": "b_peak",
+      "to": "b_factory",
+      "distance": 4,
+      "risk": 4,
+      "exposure": 4
+    },
+    {
+      "id": "eb21",
+      "from": "b_keraton",
+      "to": "b_cape",
+      "distance": 4,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "eb22",
+      "from": "b_bimasakti",
+      "to": "b_katulistiwa",
+      "distance": 4,
+      "risk": 10,
+      "exposure": 10
+    },
+    {
+      "id": "eb28",
+      "from": "b_pochinok",
+      "to": "b_mars",
+      "distance": 4,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "eb29",
+      "from": "b_pochinok",
+      "to": "b_factory",
+      "distance": 5,
+      "risk": 3,
+      "exposure": 3
+    },
+    {
+      "id": "eb30",
+      "from": "b_factory",
+      "to": "b_mars",
+      "distance": 4,
+      "risk": 3,
+      "exposure": 3
+    },
+    {
+      "id": "pmwzgkwlts9dt",
+      "from": "b_rimnam",
+      "to": "b_mars",
+      "distance": 6,
+      "risk": 7,
+      "exposure": 9
+    },
+    {
+      "id": "pmwzgs0bk6rio",
+      "from": "b_riverside",
+      "to": "pmwzgrkrl7nes",
+      "distance": 3,
+      "risk": 5,
+      "exposure": 8
+    },
+    {
+      "id": "pmwzgshm923x0",
+      "from": "pmwzgrkrl7nes",
+      "to": "b_mill",
+      "distance": 4,
+      "risk": 5,
+      "exposure": 6
+    },
+    {
+      "id": "pmwzgtstt2ya2",
+      "from": "pmwzgrkrl7nes",
+      "to": "b_keraton",
+      "distance": 3,
+      "risk": 5,
+      "exposure": 5
+    },
+    {
+      "id": "pmwzgu0ndh9qu",
+      "from": "pmwzgrkrl7nes",
+      "to": "b_peak",
+      "distance": 1,
+      "risk": 1,
+      "exposure": 1
+    },
+    {
+      "id": "pmwzgwlaoogtw",
+      "from": "pmwzgw0jukg30",
+      "to": "b_pochinok",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzh1pvcmohg",
+      "from": "pmwzh11pskh0d",
+      "to": "b_cape",
+      "distance": 1,
+      "risk": 1,
+      "exposure": 1
+    },
+    {
+      "id": "pmwzh23rsx2bg",
+      "from": "pmwzgw0jukg30",
+      "to": "b_cape",
+      "distance": 8,
+      "risk": 6,
+      "exposure": 10
+    },
+    {
+      "id": "pmwzh5a5sv0vw",
+      "from": "pmwzh11pskh0d",
+      "to": "pmwzgw0jukg30",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzh5zrkrnv2",
+      "from": "pmwzgw0jukg30",
+      "to": "pmwzh5rdshidb",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzh6gfcvqxl",
+      "from": "pmwzh5rdshidb",
+      "to": "pmwzh11pskh0d",
+      "distance": 2,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzh6so0lz1z",
+      "from": "b_mars",
+      "to": "pmwzh5rdshidb",
+      "distance": 9,
+      "risk": 4,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzhoo07llzh",
+      "from": "pmwzgrkrl7nes",
+      "to": "pmwzgw0jukg30",
+      "distance": 5,
+      "risk": 7,
+      "exposure": 7
+    },
+    {
+      "id": "pmwzhoyzkziq3",
+      "from": "pmwzgw0jukg30",
+      "to": "b_keraton",
+      "distance": 2,
+      "risk": 6,
+      "exposure": 6
+    },
+    {
+      "id": "pmwzhpgpbkd8x",
+      "from": "pmwzgw0jukg30",
+      "to": "b_peak",
+      "distance": 3,
+      "risk": 4,
+      "exposure": 6
+    },
+    {
+      "id": "pmwzhqgtjztyw",
+      "from": "b_pochinok",
+      "to": "pmwzh5rdshidb",
+      "distance": 9,
+      "risk": 10,
+      "exposure": 10
+    },
+    {
+      "id": "pmwzhr0y7uh3s",
+      "from": "b_peak",
+      "to": "b_pochinok",
+      "distance": 3,
+      "risk": 5,
+      "exposure": 8
+    },
+    {
+      "id": "pmwzhtkhj08g7",
+      "from": "b_plantation",
+      "to": "b_bimasakti",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzhu16vjnwm",
+      "from": "pmwzgrkrl7nes",
+      "to": "b_plantation",
+      "distance": 10,
+      "risk": 10,
+      "exposure": 10
+    },
+    {
+      "id": "pmwzhu6cvcc8r",
+      "from": "b_bimasakti",
+      "to": "pmwzgrkrl7nes",
+      "distance": 10,
+      "risk": 10,
+      "exposure": 10
+    },
+    {
+      "id": "pmwzhuruf0jhf",
+      "from": "b_shipyard",
+      "to": "b_plantation",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzhuyrr1x04",
+      "from": "b_bulls",
+      "to": "b_katulistiwa",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzhvc7jixg8",
+      "from": "b_katulistiwa",
+      "to": "b_plantation",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzhw3tbup57",
+      "from": "b_katulistiwa",
+      "to": "b_graveyard",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzhw9xi5po3",
+      "from": "b_observatory",
+      "to": "b_katulistiwa",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzhxckfplqm",
+      "from": "b_rimnam",
+      "to": "b_hangar",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzhxjdbtsws",
+      "from": "b_clock",
+      "to": "b_rimnam",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzhxr7bcmg0",
+      "from": "b_clock",
+      "to": "b_factory",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzi2z068ej1",
+      "from": "b_rimnam",
+      "to": "b_factory",
+      "distance": 5,
+      "risk": 2,
+      "exposure": 2
+    },
+    {
+      "id": "pmwzi3a6jg3yn",
+      "from": "b_katulistiwa",
+      "to": "b_clock",
+      "distance": 10,
+      "risk": 7,
+      "exposure": 7
+    }
+  ],
+  "originId": "b_graveyard",
+  "destinationId": "pmwzgw0jukg30",
+  "weights": {
+    "distance": 5,
+    "risk": 5,
+    "exposure": 5
+  },
+  "backgroundData": "mapas/bermuda.jpeg"
+}

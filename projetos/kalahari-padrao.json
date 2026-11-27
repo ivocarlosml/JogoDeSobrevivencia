@@ -1,0 +1,46 @@
+{
+  "version": 4,
+  "backgroundData": "mapas/kalarari.jpeg",
+  "weights": {
+    "distance": 1,
+    "risk": 2,
+    "exposure": 1
+  },
+  "originId": "k_council",
+  "destinationId": "k_mammoth",
+  "nodes": [
+    { "id": "k_council", "name": "Council Hall", "x": 375, "y": 125 },
+    { "id": "k_shrines", "name": "Shrines", "x": 655, "y": 145 },
+    { "id": "k_bayfront", "name": "Bayfront", "x": 235, "y": 215 },
+    { "id": "k_foundation", "name": "Foundation", "x": 510, "y": 195 },
+    { "id": "k_sub", "name": "The Sub", "x": 795, "y": 265 },
+    { "id": "k_refinery", "name": "Refinery", "x": 495, "y": 325 },
+    { "id": "k_stone", "name": "Stone Ridge", "x": 310, "y": 345 },
+    { "id": "k_maze", "name": "The Maze", "x": 685, "y": 355 },
+    { "id": "k_santa", "name": "Santa Catarina", "x": 195, "y": 425 },
+    { "id": "k_command", "name": "Command Post", "x": 385, "y": 475 },
+    { "id": "k_confinement", "name": "Confinement", "x": 555, "y": 485 },
+    { "id": "k_old", "name": "Old Hampton", "x": 310, "y": 565 },
+    { "id": "k_mammoth", "name": "Mammoth", "x": 735, "y": 495 }
+  ],
+  "edges": [
+    { "id": "ek1", "from": "k_council", "to": "k_bayfront", "distance": 4, "risk": 3, "exposure": 3 },
+    { "id": "ek2", "from": "k_council", "to": "k_foundation", "distance": 4, "risk": 3, "exposure": 4 },
+    { "id": "ek3", "from": "k_foundation", "to": "k_shrines", "distance": 4, "risk": 3, "exposure": 3 },
+    { "id": "ek4", "from": "k_foundation", "to": "k_refinery", "distance": 4, "risk": 5, "exposure": 4 },
+    { "id": "ek5", "from": "k_shrines", "to": "k_sub", "distance": 4, "risk": 2, "exposure": 3 },
+    { "id": "ek6", "from": "k_bayfront", "to": "k_stone", "distance": 4, "risk": 3, "exposure": 3 },
+    { "id": "ek7", "from": "k_bayfront", "to": "k_santa", "distance": 5, "risk": 2, "exposure": 4 },
+    { "id": "ek8", "from": "k_stone", "to": "k_refinery", "distance": 4, "risk": 5, "exposure": 4 },
+    { "id": "ek9", "from": "k_stone", "to": "k_command", "distance": 4, "risk": 3, "exposure": 3 },
+    { "id": "ek10", "from": "k_refinery", "to": "k_maze", "distance": 4, "risk": 4, "exposure": 3 },
+    { "id": "ek11", "from": "k_refinery", "to": "k_confinement", "distance": 4, "risk": 4, "exposure": 4 },
+    { "id": "ek12", "from": "k_sub", "to": "k_maze", "distance": 3, "risk": 3, "exposure": 2 },
+    { "id": "ek13", "from": "k_maze", "to": "k_mammoth", "distance": 4, "risk": 3, "exposure": 3 },
+    { "id": "ek14", "from": "k_santa", "to": "k_command", "distance": 5, "risk": 2, "exposure": 3 },
+    { "id": "ek15", "from": "k_santa", "to": "k_old", "distance": 4, "risk": 2, "exposure": 3 },
+    { "id": "ek16", "from": "k_command", "to": "k_old", "distance": 3, "risk": 2, "exposure": 2 },
+    { "id": "ek17", "from": "k_command", "to": "k_confinement", "distance": 4, "risk": 3, "exposure": 3 },
+    { "id": "ek18", "from": "k_confinement", "to": "k_mammoth", "distance": 5, "risk": 3, "exposure": 4 }
+  ]
+}
